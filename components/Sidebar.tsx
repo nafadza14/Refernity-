@@ -18,21 +18,21 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
   ];
 
   return (
-    <aside className="w-64 bg-brand-dark text-white flex-shrink-0 min-h-screen flex flex-col border-r border-white/5">
-      <div className="p-8">
-        <div className="flex items-center gap-2 mb-10">
-          <div className="w-10 h-10 bg-brand-purple rounded-xl flex items-center justify-center font-black text-xl shadow-lg shadow-brand-purple/20">R</div>
-          <span className="text-2xl font-black tracking-tight text-white">Refernity</span>
+    <aside className="w-72 bg-brand-dark text-white flex-shrink-0 min-h-screen flex flex-col border-r border-white/5">
+      <div className="p-10">
+        <div className="flex items-center gap-3 mb-12">
+          <div className="w-12 h-12 bg-brand-purple rounded-2xl flex items-center justify-center font-black text-2xl shadow-xl shadow-brand-purple/20">R</div>
+          <span className="text-3xl font-black tracking-tighter text-white">Refernity</span>
         </div>
         
-        <nav className="space-y-1">
+        <nav className="space-y-2">
           {menuItems.map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center gap-4 px-5 py-3.5 text-sm font-bold rounded-xl transition-all ${
+              className={`w-full flex items-center gap-4 px-6 py-4 text-sm font-black rounded-2xl transition-all ${
                 activeTab === item.id 
-                  ? 'bg-brand-purple text-white shadow-xl shadow-brand-purple/10' 
+                  ? 'bg-brand-purple text-white shadow-2xl shadow-brand-purple/20' 
                   : 'text-slate-500 hover:bg-white/5 hover:text-white'
               }`}
             >
@@ -45,12 +45,12 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
         </nav>
       </div>
 
-      <div className="mt-auto p-8 border-t border-white/5">
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-2xl bg-slate-800 flex items-center justify-center font-black text-brand-purple border border-white/5">A</div>
-          <div>
-            <p className="text-xs font-black text-white uppercase tracking-widest">Acme Corp</p>
-            <p className="text-[10px] text-brand-purple font-bold">Growth Plan</p>
+      <div className="mt-auto p-10 border-t border-white/5">
+        <div className="flex items-center gap-4 p-4 bg-white/5 rounded-3xl border border-white/5">
+          <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center font-black text-brand-purple border border-white/10">A</div>
+          <div className="overflow-hidden">
+            <p className="text-xs font-black text-white uppercase tracking-widest truncate">Acme Tech Flow</p>
+            <p className="text-[10px] text-brand-purple font-black uppercase tracking-widest">Growth Plan</p>
           </div>
         </div>
       </div>
