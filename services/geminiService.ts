@@ -37,8 +37,12 @@ export const getAIPrediction = async (user: User, productType: string = "SaaS Pr
       }
     });
 
-    // Access the text property directly from the response object
-    const result = JSON.parse(response.text.trim());
+    const text = response.text;
+    if (!text) {
+      throw new Error("Empty response from Gemini API");
+    }
+
+    const result = JSON.parse(text.trim());
     return result;
   } catch (error) {
     console.error("AI Prediction failed:", error);
