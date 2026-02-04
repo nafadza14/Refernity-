@@ -1,10 +1,19 @@
-
 import React from 'react';
 import { Sparkles, Brain, Rocket, Shield, ChevronRight, Layout, Edit3, MessageSquare, BarChart3, Settings, MousePointer2, HelpCircle, Share2, Check } from 'lucide-react';
 
 interface LandingPageProps {
   onEnterDashboard: () => void;
 }
+
+const FeatureItem: React.FC<{ icon: React.ReactNode; title: string; desc: string }> = ({ icon, title, desc }) => (
+  <div className="flex flex-col gap-6">
+    <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center shadow-lg shadow-black/5 border border-slate-50">
+      {icon}
+    </div>
+    <h3 className="text-2xl font-black text-brand-dark">{title}</h3>
+    <p className="text-brand-gray text-lg font-medium leading-relaxed">{desc}</p>
+  </div>
+);
 
 const LandingPage: React.FC<LandingPageProps> = ({ onEnterDashboard }) => {
   return (
@@ -214,15 +223,5 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnterDashboard }) => {
     </div>
   );
 };
-
-const FeatureItem: React.FC<{ icon: React.ReactNode; title: string; desc: string }> = ({ icon, title, desc }) => (
-  <div className="flex flex-col gap-6">
-    <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center shadow-lg shadow-black/5 border border-slate-50">
-      {icon}
-    </div>
-    <h3 className="text-2xl font-black text-brand-dark">{title}</h3>
-    <p className="text-brand-gray text-lg font-medium leading-relaxed">{desc}</p>
-  </div>
-);
 
 export default LandingPage;
