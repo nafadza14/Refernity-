@@ -2,7 +2,8 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { User, AIPrediction } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+// Always use process.env.API_KEY directly and only when initializing GoogleGenAI.
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const getAIPrediction = async (user: User, productType: string = "SaaS Product"): Promise<AIPrediction> => {
   try {
@@ -36,6 +37,7 @@ export const getAIPrediction = async (user: User, productType: string = "SaaS Pr
       }
     });
 
+    // Access the text property directly from the response object
     const result = JSON.parse(response.text.trim());
     return result;
   } catch (error) {
