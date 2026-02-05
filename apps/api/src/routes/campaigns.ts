@@ -1,108 +1,134 @@
 import { Router } from 'express'
 import { prisma } from '@refernity/database'
+import { authenticate } from '../middleware/auth'
 
-export const campaignRoutes = Router()
-
-// Get all campaigns for a company
-campaignRoutes.get('/company/:companyId', async (req, res) => {
-  try {
-    const { companyId } = req.params
-    
-    const campaigns = await prisma.campaign.findMany({
-      where: { companyId },
-      orderBy: { createdAt: 'desc' }
-    })
-    
-    res.json({ campaigns })
-  } catch (error) {
-    console.error('Get campaigns error:', error)
-    res.status(500).json({ error: 'Internal server error' })
-  }
-})
+const router = Router()
 
 // Create campaign
-campaignRoutes.post('/', async (req, res) => {
+router.post('/', authenticate, async (req, res) => {
   try {
     const {
       name,
-      companyId,
-      userId,
+      description,
       rewardType,
       rewardAmount,
       rewardCurrency,
-      minPayout,
+      minimumPurchase,
+      maximumRewards,
+      endDate,
       widgetConfig
     } = req.body
-    
+
     const campaign = await prisma.campaign.create({
       data: {
         name,
-        companyId,
-        userId,
+        description,
         rewardType,
         rewardAmount,
-        rewardCurrency,
-        minPayout,
-        widgetConfig,
-        active: true
+        rewardCurrency: rewardCurrency || 'USD',
+        minimumPurchase: minimumPurchase || 0,
+        maximumRewards,
+        endDate: endDate ? new Date(endDate) : null,
+        widgetConfig: widgetConfig || {},
+        userId: req.user.id,
+        isActive: true
       }
     })
-    
-    res.status(201).json({ campaign })
+
+    res.json({ success: true, campaign })
   } catch (error) {
     console.error('Create campaign error:', error)
-    res.status(500).json({ error: 'Internal server error' })
+    res.status(500).json({ error: 'Failed to create campaign' })
+  }
+})
+
+// List campaigns
+router.get('/', authenticate, async (req, res) => {
+  try {
+    const campaigns = await prisma.campaign.findMany({
+      where: { userId: req.user.id },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        _count: {
+          select: { referrals: true }
+        }
+      }
+    })
+
+    res.json({ success: true, campaigns })
+  } catch (error) {
+    console.error('List campaigns error:', error)
+    res.status(500).json({ error: 'Failed to fetch campaigns' })
+  }
+})
+
+// Get campaign details
+router.get('/:id', authenticate, async (req, res) => {
+  try {
+    const campaign = await prisma.campaign.findFirst({
+      where: {
+        id: req.params.id,
+        userId: req.user.id
+      },
+      include: {
+        referrals: {
+          orderBy: { createdAt: 'desc' },
+          take: 100
+        }
+      }
+    })
+
+    if (!campaign) {
+      return res.status(404).json({ error: 'Campaign not found' })
+    }
+
+    res.json({ success: true, campaign })
+  } catch (error) {
+    console.error('Get campaign error:', error)
+    res.status(500).json({ error: 'Failed to fetch campaign' })
   }
 })
 
 // Update campaign
-campaignRoutes.patch('/:id', async (req, res) => {
+router.patch('/:id', authenticate, async (req, res) => {
   try {
-    const { id } = req.params
-    const updateData = req.body
-    
-    const campaign = await prisma.campaign.update({
-      where: { id },
-      data: updateData
+    const campaign = await prisma.campaign.updateMany({
+      where: {
+        id: req.params.id,
+        userId: req.user.id
+      },
+      data: {
+        ...req.body,
+        updatedAt: new Date()
+      }
     })
-    
-    res.json({ campaign })
+
+    if (campaign.count === 0) {
+      return res.status(404).json({ error: 'Campaign not found' })
+    }
+
+    res.json({ success: true })
   } catch (error) {
     console.error('Update campaign error:', error)
-    res.status(500).json({ error: 'Internal server error' })
+    res.status(500).json({ error: 'Failed to update campaign' })
   }
 })
 
-// Get campaign stats
-campaignRoutes.get('/:id/stats', async (req, res) => {
+// Delete campaign
+router.delete('/:id', authenticate, async (req, res) => {
   try {
-    const { id } = req.params
-    
-    const campaign = await prisma.campaign.findUnique({
-      where: { id },
-      include: {
-        referrals: true
+    await prisma.campaign.deleteMany({
+      where: {
+        id: req.params.id,
+        userId: req.user.id
       }
     })
-    
-    if (!campaign) {
-      return res.status(404).json({ error: 'Campaign not found' })
-    }
-    
-    const stats = {
-      totalClicks: campaign.totalClicks,
-      totalSignups: campaign.totalSignups,
-      totalConversions: campaign.totalConversions,
-      totalRewardsPaid: campaign.totalRewardsPaid,
-      referralCount: campaign.referrals.length,
-      conversionRate: campaign.totalClicks > 0 
-        ? ((campaign.totalConversions / campaign.totalClicks) * 100).toFixed(2)
-        : 0
-    }
-    
-    res.json({ stats })
+
+    res.json({ success: true })
   } catch (error) {
-    console.error('Get campaign stats error:', error)
-    res.status(500).json({ error: 'Internal server error' })
+    console.error('Delete campaign error:', error)
+    res.status(500).json({ error: 'Failed to delete campaign' })
   }
 })
+
+export default router
