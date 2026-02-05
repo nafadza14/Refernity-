@@ -1,0 +1,15 @@
+/apps/web/node_modules
+/apps/web/.next
+/apps/web/out
+/apps/api/node_modules
+/apps/api/dist
+/packages/database/node_modules
+/packages/database/dist
+/packages/database/generated
+.env
+.env.local
+.DS_Store
+*.log
+.vercel
+.turbo
+dist
